@@ -12,7 +12,7 @@
         }
         .container {
             max-width: 900px;
-            margin: 0 auto 30px auto; /* Adiciona margem inferior */
+            margin: 0 auto 30px auto;
             background-color: #fff;
             padding: 30px;
             border-radius: 12px;
@@ -40,15 +40,23 @@
             box-sizing: border-box;
             font-size: 14px;
         }
+        /* Campos Readonly (Apenas Leitura) */
+        .form-group input[readonly] {
+            background-color: #f0f2f5;
+            cursor: not-allowed;
+            color: #555;
+        }
+        
         /* Grelha para formulários */
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr; /* 3 colunas */
             gap: 15px;
         }
-        .grid-col-span-2 {
-            grid-column: span 2;
-        }
+        .grid-col-span-1 { grid-column: span 1; }
+        .grid-col-span-2 { grid-column: span 2; }
+        .grid-col-span-3 { grid-column: span 3; }
+        
         .btn {
             width: 100%;
             padding: 12px;
@@ -57,16 +65,18 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            background-color: #27ae60; /* Verde */
-            color: #fff;
             transition: background-color 0.3s;
         }
-        .btn:hover {
+        .btn-produto {
+            background-color: #27ae60; /* Verde */
+            color: #fff;
+        }
+        .btn-produto:hover {
             background-color: #219d54;
         }
-        /* Botão azul para Vendas */
         .btn-venda {
             background-color: #3498db; /* Azul */
+            color: #fff;
         }
         .btn-venda:hover {
             background-color: #2980b9;
@@ -82,61 +92,29 @@
             display: none;
         }
         #statusMessage.success, #statusMessageVenda.success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #c8e6c9;
+            background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9;
         }
         #statusMessage.error, #statusMessageVenda.error {
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef9a9a;
+            background-color: #ffebee; color: #c62828; border: 1px solid #ef9a9a;
         }
         
         /* Tabela */
-        .table-container {
-            margin-top: 30px;
-            overflow-x: auto;
-        }
-        .table-container table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .table-container th, .table-container td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-            font-size: 14px;
-        }
-        .table-container th {
-            background-color: #f2f2f2;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        .action-buttons button {
-            padding: 6px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-        }
-        .edit-btn {
-            background-color: #3498db;
-            color: #fff;
-        }
-        .delete-btn {
-            background-color: #e74c3c;
-            color: #fff;
-        }
+        .table-container { margin-top: 30px; overflow-x: auto; }
+        .table-container table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .table-container th, .table-container td { padding: 12px; border: 1px solid #ddd; text-align: left; font-size: 14px; }
+        .table-container th { background-color: #f2f2f2; }
+        .action-buttons { display: flex; gap: 5px; }
+        .action-buttons button { padding: 6px 10px; font-size: 12px; cursor: pointer; border: none; border-radius: 4px; }
+        .edit-btn { background-color: #3498db; color: #fff; }
+        .delete-btn { background-color: #e74c3c; color: #fff; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Lançar Nova Venda</h2>
-        <form id="vendaForm">
+        <form id="vendaForm" onsubmit="return false;" name="vendaForm">
+            
             <div class="form-grid">
                 <div class="form-group grid-col-span-2">
                     <label for="vendaProduto">Produto</label>
@@ -144,16 +122,48 @@
                         <option value="">Carregando produtos...</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="vendaQuantidade">Quantidade Vendida</label>
-                    <input type="number" id="vendaQuantidade" step="any" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label for="vendaPrecoTotal">Preço Total (R$)</label>
-                    <input type="number" id="vendaPrecoTotal" step="0.01" min="0" required>
+                <div class="form-group grid-col-span-1">
+                    <label for="vendaPrecoUnitario">Preço Unitário (R$)</label>
+                    <input type="number" id="vendaPrecoUnitario" step="0.01" min="0" readonly>
                 </div>
             </div>
-            <button type="submit" class="btn btn-venda">Lançar Venda</button>
+
+            <div class="form-grid">
+                <div class="form-group grid-col-span-1">
+                    <label for="vendaQuantidade">Quantidade Vendida</label>
+                    <input type="number" id="vendaQuantidade" step="any" min="0" value="0" required>
+                </div>
+                <div class="form-group grid-col-span-2">
+                    <label for="vendaSubtotal">Subtotal (R$)</label>
+                    <input type="number" id="vendaSubtotal" step="0.01" min="0" readonly>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group grid-col-span-1">
+                    <label for="vendaDescontoPercentual">Desconto (%)</label>
+                    <input type="number" id="vendaDescontoPercentual" step="0.01" min="0" max="100" value="0">
+                </div>
+                <div class="form-group grid-col-span-1">
+                    <label for="vendaDescontoReal">Desconto (R$)</label>
+                    <input type="number" id="vendaDescontoReal" step="0.01" min="0" value="0">
+                </div>
+                <div class="form-group grid-col-span-1">
+                    <label for="vendaTotalComDesconto">Total com Desconto (R$)</label>
+                    <input type="number" id="vendaTotalComDesconto" step="0.01" min="0" readonly>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group grid-col-span-2">
+                    <label for="vendaUsuario">Usuário</label>
+                    <input type="text" id="vendaUsuario" value="Usuário Padrão" required>
+                </div>
+                <div class="form-group grid-col-span-1" style="margin-top: 27px;">
+                    <button id="btnLancarVenda" class="btn btn-venda">Lançar Venda</button>
+                </div>
+            </div>
+
         </form>
         <div id="statusMessageVenda"></div>
     </div>
@@ -167,23 +177,26 @@
                 <label for="nome">Nome do Produto</label>
                 <input type="text" id="nome" required>
             </div>
-            <div class="form-group">
-                <label for="unidadeVenda">Unidade de Venda</label>
-                <input type="text" id="unidadeVenda" required>
+            
+            <div class="form-grid"> <div class="form-group grid-col-span-1">
+                    <label for="unidadeVenda">Unidade de Venda</label>
+                    <input type="text" id="unidadeVenda" required>
+                </div>
+                <div class="form-group grid-col-span-1">
+                    <label for="preco">Preço (R$)</label>
+                    <input type="number" id="preco" step="0.01" min="0" required>
+                </div>
+                <div class="form-group grid-col-span-1">
+                    <label for="quantidade">Quantidade em Estoque</label>
+                    <input type="number" id="quantidade" step="any" min="0" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="preco">Preço (R$)</label>
-                <input type="number" id="preco" step="0.01" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="quantidade">Quantidade em Estoque</label>
-                <input type="number" id="quantidade" step="any" min="0" required>
-            </div>
+            
             <div class="form-group">
                 <label for="descricao">Descrição</label>
                 <input type="text" id="descricao">
             </div>
-            <button type="submit" class="btn">Cadastrar Produto</button>
+            <button type="submit" class="btn btn-produto">Cadastrar Produto</button>
         </form>
         <div id="statusMessage"></div>
 
@@ -210,15 +223,14 @@
 
     <script>
         // !! IMPORTANTE !!
-        // COLOQUE AQUI A SUA URL DO APPS SCRIPT QUE FUNCIONA NO SEU PC
-        // (Pode ser a nova que você criou ou a antiga)
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk0fSauvjEwhlq_DDRb21wHtH5qcFAs6j3XfJrHQlbW_d8qshOiEuX8lJfKQpHhZet/exec';
+        // COLOQUE AQUI A SUA URL DO APPS SCRIPT QUE FUNCIONA
+        const SCRIPT_URL = 'COLOQUE_SEU_LINK_EXEC_AQUI';
 
         // --- Event Listeners (Gatilhos da Página) ---
         
         document.addEventListener('DOMContentLoaded', function() {
-            if(SCRIPT_URL === '') {
-                exibirStatus('error', 'Por favor, cole a URL do Apps Script no código.', 'statusMessage');
+            if(SCRIPT_URL === '' || SCRIPT_URL === 'COLOQUE_SEU_LINK_EXEC_AQUI') {
+                exibirStatus('error', 'Por favor, cole a URL do Apps Script no código (SCRIPT_URL).', 'statusMessage');
                 return;
             }
             
@@ -226,9 +238,17 @@
             document.getElementById('produtoForm').addEventListener('submit', salvarProduto);
             carregarProdutos(); // Carrega a tabela de produtos
             
-            // NOVOS Gatilhos de VENDAS
-            document.getElementById('vendaForm').addEventListener('submit', submeterVenda);
+            // Gatilhos de VENDAS
             carregarDropdownProdutos(); // Carrega o dropdown de vendas
+            
+            // Gatilhos de Cálculo
+            document.getElementById('vendaProduto').addEventListener('change', calcularTotaisVenda);
+            document.getElementById('vendaQuantidade').addEventListener('input', calcularTotaisVenda);
+            document.getElementById('vendaDescontoPercentual').addEventListener('input', (e) => calcularTotaisVenda('percentual'));
+            document.getElementById('vendaDescontoReal').addEventListener('input', (e) => calcularTotaisVenda('real'));
+            
+            // Gatilho do botão de Lançar Venda
+            document.getElementById('btnLancarVenda').addEventListener('click', submeterVenda);
         });
 
         
@@ -247,12 +267,11 @@
 
         
         // =============================================
-        // === NOVAS FUNÇÕES DE VENDA ===
+        // === NOVAS FUNÇÕES DE VENDA (COMPLETAS) ===
         // =============================================
 
         /**
          * Carrega a lista de produtos da aba "Produtos" e insere no dropdown de Vendas.
-         * Usa a ação 'obterProdutos' (a mesma da tabela, é eficiente).
          */
         async function carregarDropdownProdutos() {
             const dropdown = document.getElementById('vendaProduto');
@@ -261,18 +280,18 @@
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'obterProdutos' }) // Reutiliza a função de obter produtos
+                    body: JSON.stringify({ action: 'obterProdutos' })
                 });
                 const data = await response.json();
 
                 if (data.status === 'sucesso' && data.dados.length > 0) {
                     dropdown.innerHTML = '<option value="">Selecione um produto</option>';
                     data.dados.forEach(produto => {
-                        // Adiciona o nome e o preço no próprio <option>
                         const option = document.createElement('option');
-                        option.value = produto.Nome; // O valor será o nome do produto
+                        option.value = produto.Nome;
                         option.textContent = `${produto.Nome} (R$ ${produto.Preço.toFixed(2)})`;
-                        option.dataset.preco = produto.Preço; // Guarda o preço aqui
+                        // Guarda o preço unitário no próprio <option>
+                        option.dataset.preco = produto.Preço; 
                         dropdown.appendChild(option);
                     });
                 } else {
@@ -284,29 +303,70 @@
         }
 
         /**
-         * Chamada quando o formulário de Venda é submetido.
+         * Calcula todos os totais do formulário de Vendas automaticamente.
+         * 'origemDesconto' diz qual campo o usuário editou ('percentual' ou 'real').
+         */
+        function calcularTotaisVenda(origemDesconto = null) {
+            const dropdown = document.getElementById('vendaProduto');
+            const selectedOption = dropdown.options[dropdown.selectedIndex];
+            
+            // 1. Preço Unitário e Quantidade
+            const precoUnitario = parseFloat(selectedOption.dataset.preco) || 0;
+            const quantidade = parseFloat(document.getElementById('vendaQuantidade').value) || 0;
+            
+            document.getElementById('vendaPrecoUnitario').value = precoUnitario.toFixed(2);
+            
+            // 2. Subtotal
+            const subtotal = precoUnitario * quantidade;
+            document.getElementById('vendaSubtotal').value = subtotal.toFixed(2);
+            
+            // 3. Descontos
+            let descontoPercentual = parseFloat(document.getElementById('vendaDescontoPercentual').value) || 0;
+            let descontoReal = parseFloat(document.getElementById('vendaDescontoReal').value) || 0;
+            
+            if (subtotal > 0) {
+                if (origemDesconto === 'percentual') {
+                    // Usuário digitou a porcentagem, calcula o R$
+                    descontoReal = subtotal * (descontoPercentual / 100);
+                    document.getElementById('vendaDescontoReal').value = descontoReal.toFixed(2);
+                } else if (origemDesconto === 'real') {
+                    // Usuário digitou o R$, calcula a porcentagem
+                    descontoPercentual = (descontoReal / subtotal) * 100;
+                    document.getElementById('vendaDescontoPercentual').value = descontoPercentual.toFixed(2);
+                }
+            }
+
+            // 4. Total com Desconto
+            const totalComDesconto = subtotal - descontoReal;
+            document.getElementById('vendaTotalComDesconto').value = totalComDesconto.toFixed(2);
+        }
+
+        /**
+         * Chamada quando o botão Lançar Venda é clicado.
          */
         async function submeterVenda(event) {
-            event.preventDefault(); // Impede o recarregamento da página
+            event.preventDefault(); // Garante que o formulário não recarregue
 
+            // Lê todos os valores calculados do formulário
             const venda = {
-                data: new Date().toLocaleDateString("pt-BR"), // Data de hoje
+                data: new Date().toLocaleDateString("pt-BR"),
                 itens: document.getElementById('vendaProduto').value,
                 quantidadeVendida: parseFloat(document.getElementById('vendaQuantidade').value),
-                subtotal: parseFloat(document.getElementById('vendaPrecoTotal').value),
-                descontoPercentual: 0, // Simplificado (pode adicionar depois)
-                descontoReal: 0,       // Simplificado (pode adicionar depois)
-                totalComDesconto: parseFloat(document.getElementById('vendaPrecoTotal').value),
-                usuario: "Usuário Local" // Simplificado
+                subtotal: parseFloat(document.getElementById('vendaSubtotal').value),
+                descontoPercentual: parseFloat(document.getElementById('vendaDescontoPercentual').value),
+                descontoReal: parseFloat(document.getElementById('vendaDescontoReal').value),
+                totalComDesconto: parseFloat(document.getElementById('vendaTotalComDesconto').value),
+                usuario: document.getElementById('vendaUsuario').value
             };
 
-            // Validação simples
-            if (!venda.itens || venda.quantidadeVendida <= 0 || venda.subtotal <= 0) {
-                exibirStatus('error', 'Por favor, preencha todos os campos da venda.', 'statusMessageVenda');
+            // Validação
+            if (!venda.itens || venda.quantidadeVendida <= 0 || !venda.usuario) {
+                exibirStatus('error', 'Produto, Quantidade e Usuário são obrigatórios.', 'statusMessageVenda');
                 return;
             }
 
             try {
+                // Envia o pacote completo para a ação 'lancarVenda' no Code.gs
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'lancarVenda', data: venda })
@@ -316,7 +376,12 @@
                 exibirStatus(data.status, data.mensagem, 'statusMessageVenda');
                 
                 if (data.status === 'sucesso') {
+                    // Limpa apenas os campos de Venda, mantendo o Usuário
                     document.getElementById('vendaForm').reset();
+                    document.getElementById('vendaUsuario').value = venda.usuario; // Mantém o usuário
+                    // Recarrega o dropdown de produtos (pois a quantidade em estoque pode ter mudado)
+                    await carregarProdutos(); 
+                    await carregarDropdownProdutos();
                 }
 
             } catch (error) {
@@ -419,7 +484,8 @@
                     document.getElementById('quantidade').value = produto.Quantidade;
                     document.getElementById('descricao').value = produto.Descrição || '';
                     exibirStatus('success', 'Campos preenchidos. Agora você pode editar.', 'statusMessage');
-                    window.scrollTo(0, 0); // Rola para o topo para editar
+                    // Rola a página para o container de produtos (o segundo container)
+                    document.querySelectorAll('.container')[1].scrollIntoView({ behavior: 'smooth' });
                 } else {
                     exibirStatus('error', 'Produto não encontrado para edição.', 'statusMessage');
                 }
